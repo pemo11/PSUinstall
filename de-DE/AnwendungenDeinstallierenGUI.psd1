@@ -7,4 +7,5 @@ ConvertFrom-StringData -String @'
  FixRegistryMessage = Nicht brauchbare Registry-Eintraege entfernen (J/N)
  LogfileDeleteConfirmation = wurde geloescht
  RegistryKeyDeleteErrorMessage = UInstall-Key konnte nicht geloescht werden
+ AppsUninstallingLogMessage = Anwendungen werden deinstalliert
 '@
