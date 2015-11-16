@@ -91,8 +91,14 @@ function UnInstall-Apps
     $FixRegistryMessage = $Localized.FixRegistryMessage
     $LogfileDeleteConfirmation = $Localized.LogfileDeleteConfirmation
     $RegistryKeyDeleteErrorMessage = $Localized.RegistryKeyDeleteErrorMessage
-
-    $LogPfad = Join-Path -Path $PSScriptRoot -ChildPath "SoftwareUninstaller.log"
+    $AppsUninstallingLogMessage = $Localized.AppsUninstallingLogMessage
+    $MsiExecCode0Message = ""
+    $MsiExecCode1602Message = ""
+    $MsiExecCode1603Message = ""
+    $MsiExecCode1609Message = ""
+    
+    # Logfile will be placed in the documents folder
+    $LogPfad = Join-Path -Path $env:userprofile\documents -ChildPath "SoftwareUninstaller.log"
 
     $YesReponseKey = "J"
     if ($PSUICulture -ne "de-De")
@@ -205,7 +211,8 @@ function UnInstall-Apps
 
         Get-ItemProperty -Path $UnInstallKeys -ErrorAction Ignore  |  ForEach-Object {
             $KeyEntry = $_
-            if ($KeyEntry.psobject.Properties -match "DisplayName" -and `                $KeyEntry.psobject.Properties -match "DisplayVersion" -and `
+            if ($KeyEntry.psobject.Properties -match "DisplayName" -and `
+                $KeyEntry.psobject.Properties -match "DisplayVersion" -and `
                 $KeyEntry.psobject.Properties -match "UninstallString")
             {
                 $AppListe += New-Object -TypeName PsObject -Property @{ IsSelected = $false;
@@ -240,7 +247,7 @@ function UnInstall-Apps
         $Anwendungen = @($AppListe | Where IsSelected | Select DisplayName)
         $AnwendungsNamen = $Anwendungen.DisplayName -join ","
         $MainProgressbar.Maximum = $AppListe.Count
-        $LogMessage = "$($Anwendungen.Count) Anwendungen werden deinstalliert - ($AnwendungsNamen)."
+        $LogMessage = "$($Anwendungen.Count) $AppsUninstallingLogMessage - ($AnwendungsNamen)."
         [System.Windows.MessageBox]::Show($LogMessage, $AppTitle)
 
         $LogMessage = "INFO: $LogMessage"
@@ -442,7 +449,8 @@ function UnInstall-Apps
         $MainProgressbar.Value = 0
 
         $Dauer = (Get-Date) - $StartZeit
-        $LogMessage = "{0} von {1} Anwendung(en) wurden in {2} Stunden, {3} Minuten und {4} Sekunden deinstalliert - es gab {5} Fehler." `         -f $AppCount, $AppListe.Count, $Dauer.Hours, $Dauer.Minutes, $Dauer.Seconds, $ErrorCount
+        $LogMessage = "{0} von {1} Anwendung(en) wurden in {2} Stunden, {3} Minuten und {4} Sekunden deinstalliert - es gab {5} Fehler." `
+         -f $AppCount, $AppListe.Count, $Dauer.Hours, $Dauer.Minutes, $Dauer.Seconds, $ErrorCount
         $Script:Meldungen += New-Object -TypeName PSObject -Property @{ MessageId = $Meldungen.Count + 1;
                                                                         Typ = "Info";
                                                                         Message = $LogMessage
